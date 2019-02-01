@@ -1,0 +1,108 @@
+buildscript {
+	ext {
+		springBootVersion = '2.1.1.RELEASE'
+	}
+	repositories {
+		mavenCentral()
+		jcenter()
+	}
+	dependencies {
+		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+		classpath 'se.transmode.gradle:gradle-docker:1.2'
+	}
+}
+
+plugins {
+    id 'io.franzbecker.gradle-lombok' version '1.8'
+}
+
+apply plugin: 'java'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+apply plugin: 'application'
+apply plugin: 'docker'
+//apply plugin: 'com.jfrog.artifactory' //descomentar com uma conta válida
+apply plugin: 'maven-publish'
+apply plugin: 'jacoco'
+
+group = 'com.vagas'
+version = '0.0.1'
+sourceCompatibility = '1.8'
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	runtimeOnly 'org.springframework.boot:spring-boot-devtools'
+	
+	compile group: 'io.springfox', name: 'springfox-swagger2', version: '2.9.2'
+	
+	compile 'com.hazelcast:spring-data-hazelcast:2.1'
+    compile 'com.hazelcast:hazelcast'
+	
+	compile 'com.hazelcast:hazelcast-spring'
+	
+	compile group: 'org.modelmapper', name: 'modelmapper', version: '2.3.2'
+	compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.8'
+	
+	compile group: 'com.google.guava', name: 'guava', version: '27.0.1-jre'
+	
+	testCompile group: 'com.google.guava', name: 'guava-testlib', version: '27.0.1-jre'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+task buildDocker(type: Docker, dependsOn: build) {
+	push = false
+	applicationName = jar.baseName
+	dockerfile = file('src/main/docker/Dockerfile')
+	doFirst {
+		copy {
+			from jar
+			into stageDir
+		}
+	}
+}
+
+mainClassName = 'com.vagas.desafiotecnico.DesafioTecnicoApplication'
+
+//decomentar com uma conta válida.
+/* Publicação no jfrog  
+artifactoryPublish.skip = true // Alterar para 'false' somente quando for publicar o artefato.
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            artifact sourcesJar
+            artifact javadocJar
+        }
+    }
+}
+
+artifactory {
+    contextUrl = "${artifactory_contextUrl}"
+    publish {
+        repository {
+            repoKey = 'gradle-dev-local'
+            username = "${artifactory_user}"
+            password = "${artifactory_password}"
+        }
+        defaults {
+            publications('mavenJava')
+        }
+    }
+}
+*/
