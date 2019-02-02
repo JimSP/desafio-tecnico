@@ -1,8 +1,12 @@
 package com.vagas.desafiotecnico.services.impl;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.vagas.desafiotecnico.dtos.StatusCodeDto;
+import com.vagas.desafiotecnico.exceptions.SistemaIndisponivelException;
 import com.vagas.desafiotecnico.functions.FuncaoMenorCaminho;
 import com.vagas.desafiotecnico.functions.FuncaoPontuacao;
 import com.vagas.desafiotecnico.models.Candidato;
@@ -21,15 +25,18 @@ public final class CalcularPontuacaoCandidatoService implements CalcularPontuaca
 
 	@Autowired
 	private FuncaoPontuacao funcaoPontuacao;
-	
+
 	@Autowired
 	private FuncaoMenorCaminho funcaoMenorCaminho;
-	
+
 	@Autowired
 	private RegioesInterface regioesService;
 
-	/* (non-Javadoc)
-	 * @see com.vagas.desafiotecnico.services.CalcularPontuacaoCandidatoInterface#calcular(com.vagas.desafiotecnico.models.Candidatura)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.vagas.desafiotecnico.services.CalcularPontuacaoCandidatoInterface#
+	 * calcular(com.vagas.desafiotecnico.models.Candidatura)
 	 */
 	@Override
 	public Candidatura calcular(final Candidatura candidatura) {
@@ -41,33 +48,33 @@ public final class CalcularPontuacaoCandidatoService implements CalcularPontuaca
 	}
 
 	protected Integer buscarMenorDistancia(final Candidatura candidatura, final Regiao regiao) {
-		
+
 		final Candidato candidato = candidatura.getCandidato();
 		final Vaga vaga = candidatura.getVaga();
-		
-		final Localidade localidadeCandidato = funcaoMenorCaminho.buscarLocalidade(regiao, candidato.getLocalizacao());
-		final Localidade localidadeVaga = funcaoMenorCaminho.buscarLocalidade(regiao, vaga.getLocalizacao());
-		
-		return funcaoMenorCaminho.buscarMenorCaminhoDaRegiao(regiao, localidadeCandidato)
-				.getLocalidades()
-				.stream()
-				.filter(predicate -> predicate.equals(localidadeVaga))
-				.findFirst()
-				.get()
-				.getDistancia();
+
+		final Optional<Localidade> localidadeCandidato = funcaoMenorCaminho.buscarLocalidade(regiao,
+				candidato.getLocalizacao());
+		final Optional<Localidade> localidadeVaga = funcaoMenorCaminho.buscarLocalidade(regiao, vaga.getLocalizacao());
+
+		if (localidadeCandidato.isPresent() && localidadeVaga.isPresent()) {
+			final Optional<Localidade> localidades = funcaoMenorCaminho
+					.buscarMenorCaminhoDaRegiao(regiao, localidadeCandidato.get()).getLocalidades().stream()
+					.filter(localidade -> localidade.equals(localidadeVaga.get())).findFirst();
+
+			return localidades.orElseThrow(
+					() -> new SistemaIndisponivelException(StatusCodeDto.CODIGO_ERRO_SISTEMA_INDIPONIVEL.getMensagem()))
+					.getDistancia();
+		}
+
+		throw new SistemaIndisponivelException(StatusCodeDto.CODIGO_ERRO_SISTEMA_INDIPONIVEL.getMensagem());
+
 	}
-	
+
 	protected Pontuacao calcularPontuacao(final Candidatura candidatura, final Integer menorDistancia) {
-		final N n = N
-				.builder()
-				.nivelExperienciaCandidato(candidatura.getCandidato().getNivel())
-				.nivelExperienciaEsperado(candidatura.getVaga().getNivel())
-				.build();
-		
+		final N n = N.builder().nivelExperienciaCandidato(candidatura.getCandidato().getNivel())
+				.nivelExperienciaEsperado(candidatura.getVaga().getNivel()).build();
+
 		final D d = D.of(menorDistancia);
-		
-		final Pontuacao pontuacao = funcaoPontuacao.calcular(n, d);
-		candidatura.getCandidato().setPontuacao(pontuacao.getPontuacao());
-		return pontuacao;
+		return funcaoPontuacao.calcular(n, d);
 	}
 }

@@ -3,8 +3,6 @@ package com.vagas.desafiotecnico.services;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
 
-import java.util.NoSuchElementException;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -12,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import com.vagas.desafiotecnico.exceptions.SistemaIndisponivelException;
 import com.vagas.desafiotecnico.models.Candidato;
 import com.vagas.desafiotecnico.models.Candidatura;
 import com.vagas.desafiotecnico.models.NivelExperiencia;
@@ -86,7 +85,7 @@ public class CalcularPontuacaoCandidatoServiceTeste {
 		assertThat(calcularPontuacaoCandidatoService.calcular(candidaturaF).getCandidato().getPontuacao(), equalTo(12));
 	}
 
-	@Test(expected = NoSuchElementException.class)
+	@Test(expected = SistemaIndisponivelException.class)
 	public void calcularParaVagaInexistente() {
 		
 		log.debug("m=calcularParaVagaInexistente");

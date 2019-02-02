@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.vagas.desafiotecnico.dtos.ApiStatusDto;
 import com.vagas.desafiotecnico.dtos.MensagemErroDto;
+import com.vagas.desafiotecnico.dtos.StatusCodeDto;
 import com.vagas.desafiotecnico.exceptions.CaminhoNaoEncontradoExceptions;
 import com.vagas.desafiotecnico.exceptions.CandidatoNaoExisteException;
 import com.vagas.desafiotecnico.exceptions.CandidaturaNaoExisteExceptions;
@@ -18,42 +19,43 @@ import com.vagas.desafiotecnico.exceptions.VagaNaoExisteException;
 public class ApiAdviceRestController {
 
 	@ExceptionHandler(CandidatoNaoExisteException.class)
-	@ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Candidato não existe.")
+	@ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Candidato nao existe.")
 	public @ResponseBody ApiStatusDto naoExiste(final CandidatoNaoExisteException canditadoNaoExisteException) {
 		return MensagemErroDto
 				.builder()
-				.mensagem(String.format("Pessoa não exite, pessoa_id=", canditadoNaoExisteException.getIdCandidato()))
-				.codigo(1)
+				.mensagem(String.format(StatusCodeDto.CODIGO_ERRO_CANDIDATO_NAO_EXISTE.getMensagem(), canditadoNaoExisteException.getIdCandidato()))
+				.codigo(StatusCodeDto.CODIGO_ERRO_CANDIDATO_NAO_EXISTE.getCodigo())
 				.build();
 	}
 
 	@ExceptionHandler(VagaNaoExisteException.class)
-	@ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Vaga não existe.")
+	@ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Vaga nao existe.")
 	public @ResponseBody ApiStatusDto naoExiste(final VagaNaoExisteException vagaNaoExisteException) {
 		return MensagemErroDto
 				.builder()
-				.mensagem(String.format("Vaga não exite, vaga_id=", vagaNaoExisteException.getIdVaga()))
-				.codigo(2)
+				.mensagem(String.format(StatusCodeDto.CODIGO_ERRO_VAGA_NAO_EXISTE.getMensagem(), vagaNaoExisteException.getIdVaga()))
+				.codigo(StatusCodeDto.CODIGO_ERRO_VAGA_NAO_EXISTE.getCodigo())
 				.build();
 	}
 
 	@ExceptionHandler(CandidaturaNaoExisteExceptions.class)
-	@ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Não existe candidatura para a vaga.")
+	@ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Nao existe candidatura para a vaga.")
 	public @ResponseBody ApiStatusDto naoExiste(final CandidaturaNaoExisteExceptions candidaturaNaoExisteExceptions) {
 		return MensagemErroDto
 				.builder()
-				.mensagem(String.format("Não existe candidatura para a vaga, vaga_id=",
-				candidaturaNaoExisteExceptions.getIdVaga())).codigo(2)
+				.mensagem(String.format(StatusCodeDto.CODIGO_ERRO_CANDIDATURA_NAO_EXISTE.getMensagem(),
+				candidaturaNaoExisteExceptions.getIdVaga()))
+				.codigo(StatusCodeDto.CODIGO_ERRO_CANDIDATURA_NAO_EXISTE.getCodigo())
 				.build();
 	}
 
 	@ExceptionHandler(CaminhoNaoEncontradoExceptions.class)
-	@ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR, reason = "Caminho não encontrado")
+	@ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR, reason = "Caminho nao encontrado")
 	public @ResponseBody ApiStatusDto naoExiste(final CaminhoNaoEncontradoExceptions caminhoNaoEncontradoExceptions) {
 		return MensagemErroDto
 				.builder()
 				.mensagem(caminhoNaoEncontradoExceptions.getMessage())
-				.codigo(98)
+				.codigo(StatusCodeDto.CODIGO_ERRO_CAMINHO_NAO_ENCONTRADO.getCodigo())
 				.build();
 	}
 
@@ -63,7 +65,7 @@ public class ApiAdviceRestController {
 		return MensagemErroDto
 				.builder()
 				.mensagem(sistemaIndisponivelException.getMessage())
-				.codigo(99)
+				.codigo(StatusCodeDto.CODIGO_ERRO_SISTEMA_INDIPONIVEL.getCodigo())
 				.build();
 	}
 }

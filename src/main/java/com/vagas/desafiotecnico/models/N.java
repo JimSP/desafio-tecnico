@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /***
  * Número N: 100 - (25 * (nivelExperienciaEsperado -  nivelExperienciaCandidato))
@@ -15,6 +16,7 @@ import lombok.Data;
  */
 @Data
 @Builder
+@EqualsAndHashCode(callSuper=false)
 public final class N implements Serializable {
 
 	private static final long serialVersionUID = 5644855017828439162L;
@@ -28,6 +30,6 @@ public final class N implements Serializable {
 	 */
 	public BigDecimal getN() {
 		return BigDecimal
-				.valueOf(100 - (25 * (nivelExperienciaEsperado.ordinal() - nivelExperienciaCandidato.ordinal())));
+				.valueOf(100L - (25L * (nivelExperienciaEsperado.ordinal() - nivelExperienciaCandidato.ordinal())));
 	}
 }

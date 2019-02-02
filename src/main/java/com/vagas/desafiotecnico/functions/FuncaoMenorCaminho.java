@@ -2,7 +2,9 @@ package com.vagas.desafiotecnico.functions;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.cache.annotation.Cacheable;
@@ -31,9 +33,11 @@ public class FuncaoMenorCaminho {
 	 * @return Localidade
 	 */
 	@Cacheable("buscarLocalidade")
-	public Localidade buscarLocalidade(Regiao regiao, Ponto ponto) {
-		return regiao.getLocalidades().stream().filter(localidade -> localidade.getPonto().equals(ponto)).findFirst()
-				.get();
+	public Optional<Localidade> buscarLocalidade(Regiao regiao, Ponto ponto) {
+		return regiao.getLocalidades()
+				.stream()
+				.filter(localidade -> localidade.getPonto().equals(ponto))
+				.findFirst();
 	}
 
 	/***
@@ -57,24 +61,30 @@ public class FuncaoMenorCaminho {
 
 		localidadesDesconsideradas.add(localidade);
 
-		while (localidadesDesconsideradas.size() != 0) {
+		while (!localidadesDesconsideradas.isEmpty()) {
 			final Localidade localidadeAtual = obterMenoresDistancias(localidadesDesconsideradas);
 			localidadesDesconsideradas.remove(localidadeAtual);
-			for (final Entry<Localidade, Integer> distanciaAdjacente : localidadeAtual.getLocalidadesVisinhas()
-					.entrySet()) {
-				final Localidade localidadeAdjacente = distanciaAdjacente.getKey();
-				final Integer distancia = distanciaAdjacente.getValue();
 
-				if (!localidadesCurtas.contains(localidadeAdjacente)) {
-					calcularMinimaDistancia(localidadeAdjacente, distancia, localidadeAtual);
-					localidadesDesconsideradas.add(localidadeAdjacente);
+			Optional.ofNullable(localidadeAtual).ifPresent(localidadeAtualPresent->{
+				final Map<Localidade, Integer> localidadesVisinhas = localidadeAtual.getLocalidadesVisinhas();
+				if (localidadesVisinhas != null && !localidadesVisinhas.isEmpty()) {
+					for (final Entry<Localidade, Integer> distanciaAdjacente : localidadeAtual.getLocalidadesVisinhas()
+							.entrySet()) {
+						final Localidade localidadeAdjacente = distanciaAdjacente.getKey();
+						final Integer distancia = distanciaAdjacente.getValue();
+
+						if (!localidadesCurtas.contains(localidadeAdjacente)) {
+							calcularMinimaDistancia(localidadeAdjacente, distancia, localidadeAtual);
+							localidadesDesconsideradas.add(localidadeAdjacente);
+						}
+					}
 				}
-			}
-			localidadesCurtas.add(localidadeAtual);
+				localidadesCurtas.add(localidadeAtual);
+			});
 		}
-		
+
 		regiao.setLocalidades(localidadesCurtas);
-		
+
 		return regiao;
 	}
 

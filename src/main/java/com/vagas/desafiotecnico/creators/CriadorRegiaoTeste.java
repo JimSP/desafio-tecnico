@@ -9,6 +9,10 @@ import com.vagas.desafiotecnico.models.Regiao;
 
 public class CriadorRegiaoTeste {
 	
+	private CriadorRegiaoTeste() {
+		
+	}
+	
 	public static Regiao criarRegiaoDeTeste() {
 		final Localidade localidadeA = criarLocalidade(Ponto.A);
 		final Localidade localidadeB = criarLocalidade(Ponto.B);

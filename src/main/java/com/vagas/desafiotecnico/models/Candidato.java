@@ -11,10 +11,16 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-
+/***
+ * Representa uma pessoa a procura de uma Vaga em um Ponto.
+ * Essa pessoa é classificada conforme seu NivelExperiencia.
+ * 
+ * @author alexandre
+ *
+ */
 @Data
 @Builder
-@EqualsAndHashCode
+@EqualsAndHashCode(of="id")
 @AllArgsConstructor
 @NoArgsConstructor
 @KeySpace("Candidato")

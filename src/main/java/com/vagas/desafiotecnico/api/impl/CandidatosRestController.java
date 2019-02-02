@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.vagas.desafiotecnico.api.CandidatosRestInterface;
 import com.vagas.desafiotecnico.dtos.CandidatoDto;
+import com.vagas.desafiotecnico.dtos.StatusCodeDto;
 import com.vagas.desafiotecnico.models.Candidato;
 import com.vagas.desafiotecnico.services.CandidatosInterface;
 
@@ -39,8 +40,8 @@ public class CandidatosRestController implements CandidatosRestInterface {
 		final Candidato candidatoResult = candidatosService.salvar(candidato);
 		final CandidatoDto candidatoDtoResponse = modelMapper.map(candidatoResult, CandidatoDto.class);
 
-		candidatoDtoResponse.setCodigo(0);
-		candidatoDtoResponse.setMensagem("OK");
+		candidatoDtoResponse.setCodigo(StatusCodeDto.CODIGO_SUCESSO.getCodigo());
+		candidatoDtoResponse.setMensagem(StatusCodeDto.CODIGO_SUCESSO.getMensagem());
 		return candidatoDtoResponse;
 	}
 }

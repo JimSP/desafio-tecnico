@@ -9,12 +9,14 @@ import org.springframework.data.keyvalue.annotation.KeySpace;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(of="id")
 @KeySpace("Vaga")
 public final class Vaga implements Serializable{
 

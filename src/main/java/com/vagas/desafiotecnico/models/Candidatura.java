@@ -11,10 +11,15 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-
+/***
+ * Representa o interesse de um Candidato por uma Vaga
+ * 
+ * @author alexandre
+ *
+ */
 @Data
 @Builder
-@EqualsAndHashCode
+@EqualsAndHashCode(of="id")
 @AllArgsConstructor
 @NoArgsConstructor
 @KeySpace("Candidatura")

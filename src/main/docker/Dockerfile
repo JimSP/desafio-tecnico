@@ -1,4 +1,4 @@
-FROM expertsystems/oracle-jdk8:latest
+FROM kdvolder/jdk8:latest
 MAINTAINER Alexandre Moraes <alexandre.msl@gmail.com>
 VOLUME /tmp
 EXPOSE 9000:9000

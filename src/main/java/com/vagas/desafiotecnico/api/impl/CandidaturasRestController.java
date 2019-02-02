@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.vagas.desafiotecnico.api.CandidaturasRestInterface;
 import com.vagas.desafiotecnico.dtos.CandidatoDto;
 import com.vagas.desafiotecnico.dtos.CandidaturaDto;
+import com.vagas.desafiotecnico.dtos.StatusCodeDto;
 import com.vagas.desafiotecnico.models.Candidato;
 import com.vagas.desafiotecnico.models.Candidatura;
 import com.vagas.desafiotecnico.models.Vaga;
@@ -62,8 +63,9 @@ public class CandidaturasRestController implements CandidaturasRestInterface {
 		final Candidatura candidaturaResult = candidaturaService.candidatar(candidato, vaga);
 		
 		final CandidaturaDto candidaturaDtoResponse = modelMapper.map(candidaturaResult, CandidaturaDto.class);
-		candidaturaDtoResponse.setCodigo(0);
-		candidaturaDtoResponse.setMensagem("OK");
+		
+		candidaturaDtoResponse.setCodigo(StatusCodeDto.CODIGO_SUCESSO.getCodigo());
+		candidaturaDtoResponse.setMensagem(StatusCodeDto.CODIGO_SUCESSO.getMensagem());
 		
 		return candidaturaDtoResponse;
 	}
@@ -75,13 +77,11 @@ public class CandidaturasRestController implements CandidaturasRestInterface {
 	@GetMapping(path = "/v1/vagas/{id_vaga}/candidaturas/ranking", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public @ResponseBody List<CandidatoDto> get(@PathVariable(name = "id_vaga", required = true) BigInteger idVaga) {
 		final List<Candidatura> candidaturas = candidaturaService.buscarCandidatura(idVaga);
-
-		final List<CandidatoDto> candidatos = candidaturas
+		
+		return candidaturas
 				.stream()
 				.map(candidatura -> calcularPontuacaoCandidatoService.calcular(candidatura).getCandidato())
 				.map(mapper->modelMapper.map(mapper, CandidatoDto.class))
 				.collect(Collectors.toList());
-		
-		return candidatos;
 	}
 }

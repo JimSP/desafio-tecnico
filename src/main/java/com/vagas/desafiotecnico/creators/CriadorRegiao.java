@@ -8,6 +8,10 @@ import com.vagas.desafiotecnico.models.Localidade;
 import com.vagas.desafiotecnico.models.Regiao;
 
 public final class CriadorRegiao {
+	
+	private CriadorRegiao() {
+		
+	}
 
 	public static Regiao criarRegiao(final Localidade... localidades) {
 		return Regiao

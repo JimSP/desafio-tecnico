@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.vagas.desafiotecnico.api.VagasRestInterface;
+import com.vagas.desafiotecnico.dtos.StatusCodeDto;
 import com.vagas.desafiotecnico.dtos.VagaDto;
 import com.vagas.desafiotecnico.models.Vaga;
 import com.vagas.desafiotecnico.services.VagasInterface;
@@ -38,8 +39,9 @@ public class VagasRestController implements VagasRestInterface {
 		final Vaga cagaCriada = vagasService.salvar(vaga);
 		
 		final VagaDto vagaResultDto = modelMapper.map(cagaCriada, VagaDto.class);
-		vagaResultDto.setCodigo(0);
-		vagaResultDto.setMensagem("OK");
+		
+		vagaResultDto.setCodigo(StatusCodeDto.CODIGO_SUCESSO.getCodigo());
+		vagaResultDto.setMensagem(StatusCodeDto.CODIGO_SUCESSO.getMensagem());
 		
 		return vagaResultDto;
 	}
