@@ -58,11 +58,7 @@ Os testes únitarios foram sendo escritos conforme a necessidade de verificaçã
 Alguns perderam o sentido e foram retirados do código.
 Foram levados dois pontos em consideração:
 
-	testar funcionalidades, os testes foram escritos para terem sentido.
-	
-	serem integrados.
-	
-	ter uma corbertura realmente significativa, ou seja, cobrir trechos de código que precisam ser cobertos.
+	testar funcionalidades, os testes foram escritos para terem sentido e serem integrados..	ter uma corbertura realmente significativa, ou seja, cobrir trechos de código que precisam ser cobertos..
 
 O Tratamento de erros foi feito com o intuito de ser o mais auto-explicativo e fornecer uma boa rastreabilidade para analises..
 O Log segue esse mesmo raciocinio, foi utilizado um padrão bastante rigoroso na escrita de logs afim de facilitar a O Log segue esse mesmo raciocinio, foi utilizado um padrão bastante rigoroso na escrita de logs afim de facilitar consultas e consultas por um Splunk Graylog ou ELK por exemplo..
