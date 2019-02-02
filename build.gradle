@@ -21,7 +21,7 @@ apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
 apply plugin: 'application'
 apply plugin: 'docker'
-//apply plugin: 'com.jfrog.artifactory' //descomentar com uma conta válida
+apply plugin: 'com.jfrog.artifactory'
 apply plugin: 'maven-publish'
 apply plugin: 'jacoco'
 
@@ -57,7 +57,7 @@ dependencies {
 
 task buildDocker(type: Docker, dependsOn: build) {
 	push = false
-	applicationName = 'desafio-tecnico'
+	applicationName = jar.baseName
 	dockerfile = file('src/main/docker/Dockerfile')
 	doFirst {
 		copy {
@@ -69,8 +69,8 @@ task buildDocker(type: Docker, dependsOn: build) {
 
 mainClassName = 'com.vagas.desafiotecnico.DesafioTecnicoApplication'
 
-//decomentar com uma conta válida.
-/* Publicação no jfrog  
+
+/* Publicação no jfrog */
 artifactoryPublish.skip = true // Alterar para 'false' somente quando for publicar o artefato.
 
 task sourcesJar(type: Jar) {
@@ -106,4 +106,3 @@ artifactory {
         }
     }
 }
-*/
