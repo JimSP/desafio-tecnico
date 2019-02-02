@@ -36,7 +36,7 @@ public class FuncaoMenorCaminho {
 	public Optional<Localidade> buscarLocalidade(Regiao regiao, Ponto ponto) {
 		return regiao.getLocalidades()
 				.stream()
-				.filter(localidade -> localidade.getPonto().equals(ponto))
+				.filter(localidade -> localidade.getPonto().equals(ponto.name()))
 				.findFirst();
 	}
 
