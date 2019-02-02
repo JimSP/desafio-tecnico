@@ -18,8 +18,23 @@ public class CriaRegiaoTestCommandLineRunner implements CommandLineRunner {
 	public void run(String... args) throws Exception {
 
 		if (!regioesService.existeRegiao()) {
-			final Regiao regiao = CriadorRegiaoTeste.criarRegiaoDeTeste();
-			regioesService.salvar(regiao);
+			final Regiao regiaoA = CriadorRegiaoTeste.criarRegiaoDeTesteAPartirA();
+			regioesService.salvar(regiaoA);
+			
+			final Regiao regiaoB = CriadorRegiaoTeste.criarRegiaoDeTesteAPartirB();
+			regioesService.salvar(regiaoB);
+			
+			final Regiao regiaoC = CriadorRegiaoTeste.criarRegiaoDeTesteAPartirC();
+			regioesService.salvar(regiaoC);
+			
+			final Regiao regiaoD = CriadorRegiaoTeste.criarRegiaoDeTesteAPartirD();
+			regioesService.salvar(regiaoD);
+			
+			final Regiao regiaoE = CriadorRegiaoTeste.criarRegiaoDeTesteAPartirE();
+			regioesService.salvar(regiaoE);
+			
+			final Regiao regiaoF = CriadorRegiaoTeste.criarRegiaoDeTesteAPartirF();
+			regioesService.salvar(regiaoF);
 		}
 	}
 

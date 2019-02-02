@@ -40,7 +40,7 @@ public final class CalcularPontuacaoCandidatoService implements CalcularPontuaca
 	 */
 	@Override
 	public Candidatura calcular(final Candidatura candidatura) {
-		final Regiao regiao = regioesService.buscar();
+		final Regiao regiao = regioesService.buscar(candidatura.getCandidato().getLocalizacao());
 		final Integer menorDistancia = buscarMenorDistancia(candidatura, regiao);
 		final Pontuacao pontuacao = calcularPontuacao(candidatura, menorDistancia);
 		candidatura.getCandidato().setPontuacao(pontuacao.getPontuacao());
@@ -58,8 +58,11 @@ public final class CalcularPontuacaoCandidatoService implements CalcularPontuaca
 
 		if (localidadeCandidato.isPresent() && localidadeVaga.isPresent()) {
 			final Optional<Localidade> localidades = funcaoMenorCaminho
-					.buscarMenorCaminhoDaRegiao(regiao, localidadeCandidato.get()).getLocalidades().stream()
-					.filter(localidade -> localidade.equals(localidadeVaga.get())).findFirst();
+					.buscarMenorCaminhoDaRegiao(regiao, localidadeCandidato.get())
+					.getLocalidades()
+					.stream()
+					.filter(localidade -> localidade.equals(localidadeVaga.get()))
+					.findFirst();
 
 			return localidades.orElseThrow(
 					() -> new SistemaIndisponivelException(StatusCodeDto.CODIGO_ERRO_SISTEMA_INDIPONIVEL.getMensagem()))

@@ -3,7 +3,21 @@
 cd desafio-tecnico
 ./gradlew clean buildDocker
 
-###Arquitetura
+###Lógica
+O modelo pensando efetua o calculo de distancias na Regiao (Grafo) à partir de uma Localidade (Nó), calculando assim todas as distancias para essa Localidade.
+
+Na inicialização são carregadas as Regioes para cada Localidade, e por demanda essa região vai sendo calculada e armazenada no cache do cluster.c
+
+Melhorias possiveis:
+
+	Caso o tamanho da Regiao fique absurdamente grande (ordem de dezena de milhões) talvez deva ser considerado dois pontos:
+		1. efetuar o calculo da Regiao durante a inicialização.
+		2. alterar a lógica para efetuar busca por Caminhos (arestas), para isso seria preciso criar um novo método na classe FuncaoMenorCaminho. O novo método:
+			public Optional<Localidade> buscarLocalidade(Regiao regiao, Ponto pontoOrigem, Ponto pontoDestino);
+			
+		Com essa abordagem não seria mais preciso ter uma carga de Regiões na inicialização, porém o tempo médio de uma busca seria significamente mais alto, porém ainda dentro do aceitavel (muito menor que 1s).
+
+###Arquiteturaa
 
 O primeiro ponto levado em consideração foi manter o código simples, limpo e
 legivel.

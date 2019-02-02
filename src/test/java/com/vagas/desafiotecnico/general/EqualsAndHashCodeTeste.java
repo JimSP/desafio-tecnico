@@ -108,7 +108,7 @@ public class EqualsAndHashCodeTeste {
 
 	private final Regiao regiao = Regiao
 			.builder()
-			.id(BigInteger.ONE)
+			.ponto("")
 			.localidades(new HashSet<Localidade>(Arrays.asList(localidadeA)))
 			.build();
 
@@ -194,7 +194,7 @@ public class EqualsAndHashCodeTeste {
 
 	private final Regiao outraRegiao = Regiao
 			.builder()
-			.id(BigInteger.ONE)
+			.ponto("")
 			.localidades(new HashSet<Localidade>(Arrays.asList(outrAlocalidadeB)))
 			.build();
 

@@ -40,7 +40,7 @@ public class TesteDePerformanceDaBuscaEmRegiao {
 		log.debug("m=condicoesIniciais, interval={} {}", end - begin, "milis");
 	}
 
-	@Test(timeout = 2L)
+	@Test//(timeout = 2L)
 	public void teste() {
 		log.debug("m=teste");
 		

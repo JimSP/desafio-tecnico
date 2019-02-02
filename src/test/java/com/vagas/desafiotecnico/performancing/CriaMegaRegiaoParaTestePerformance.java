@@ -1,6 +1,5 @@
 package com.vagas.desafiotecnico.performancing;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -23,7 +22,7 @@ public final class CriaMegaRegiaoParaTestePerformance {
 
 	public static Regiao criar(final Localidade localidade, final Integer qtdLocalidade, final Consumer<String> localidadesCriadasConsumer) {
 		final Regiao.RegiaoBuilder builder = Regiao.builder();
-		builder.id(BigInteger.TEN);
+		builder.ponto(UUID.randomUUID().toString());
 		
 		final Set<Localidade> localidades = new HashSet<>();
 		int i = 0;

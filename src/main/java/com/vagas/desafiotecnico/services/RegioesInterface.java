@@ -1,5 +1,6 @@
 package com.vagas.desafiotecnico.services;
 
+import com.vagas.desafiotecnico.models.Ponto;
 import com.vagas.desafiotecnico.models.Regiao;
 
 /***
@@ -19,11 +20,11 @@ public interface RegioesInterface {
 	Regiao salvar(final Regiao regiao);
 
 	/***
-	 * busca a Regiao carregada no Cluster
+	 * busca a Regiao carregada no Cluster com distancias à partir de um Ponto.
 	 * 
 	 * @return Regiao
 	 */
-	Regiao buscar();
+	Regiao buscar(final Ponto ponto);
 
 	/***
 	 * verifica se a região foi carregada no Cluster

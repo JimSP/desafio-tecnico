@@ -1,20 +1,17 @@
 package com.vagas.desafiotecnico.services.impl;
 
-import java.math.BigInteger;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.vagas.desafiotecnico.exceptions.SistemaIndisponivelException;
+import com.vagas.desafiotecnico.models.Ponto;
 import com.vagas.desafiotecnico.models.Regiao;
 import com.vagas.desafiotecnico.repositories.RegiaoRepository;
 import com.vagas.desafiotecnico.services.RegioesInterface;
 
 @Service
 public class RegioesService implements RegioesInterface {
-	
-	private static final BigInteger ID_REGIAO = BigInteger.ONE;
 	
 	@Autowired
 	private RegiaoRepository regiaoRepository;
@@ -25,7 +22,6 @@ public class RegioesService implements RegioesInterface {
 	@Override
 	@Transactional
 	public Regiao salvar(final Regiao regiao) {
-		regiao.setId(ID_REGIAO);
 		return regiaoRepository.save(regiao);
 	}
 	
@@ -33,8 +29,8 @@ public class RegioesService implements RegioesInterface {
 	 * @see com.vagas.desafiotecnico.services.impl.RegioesInterface#buscar()
 	 */
 	@Override
-	public Regiao buscar() {
-		return regiaoRepository.findById(ID_REGIAO)
+	public Regiao buscar(final Ponto ponto) {
+		return regiaoRepository.findById(ponto.name())
 				.orElseThrow(() -> new SistemaIndisponivelException(
 						"Sistema indiponivel no momento, tente novamente em alguns minutos."));
 	}
@@ -44,6 +40,6 @@ public class RegioesService implements RegioesInterface {
 	 */
 	@Override
 	public Boolean existeRegiao() {
-		return regiaoRepository.existsById(ID_REGIAO);
+		return regiaoRepository.count() > 0L;
 	}
 }

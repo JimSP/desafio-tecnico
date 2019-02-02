@@ -5,4 +5,5 @@ if [ ! -d .git ]; then
 fi
 
 git pull
-./gradlew clean buildDocker
+./gradlew clean build buildDocker --refresh-dependencies
+docker run

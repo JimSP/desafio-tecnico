@@ -28,7 +28,7 @@ public class FuncaoMenorCaminhoTeste {
 
 		log.debug("m=teste");
 
-		final Regiao regiao = CriadorRegiaoTeste.criarRegiaoDeTeste();
+		final Regiao regiao = CriadorRegiaoTeste.criarRegiaoDeTesteAPartirA();
 
 		log.debug("m=teste, msg=\"regiao criada\", regiao={}", regiao);
 

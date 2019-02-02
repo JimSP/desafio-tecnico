@@ -1,14 +1,11 @@
 buildscript {
-	ext {
-		springBootVersion = '2.1.1.RELEASE'
-	}
 	repositories {
 		mavenCentral()
 		jcenter()
 	}
 	dependencies {
-		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
-		classpath 'se.transmode.gradle:gradle-docker:1.2'
+		classpath('org.springframework.boot:spring-boot-gradle-plugin:2.1.1.RELEASE')
+		classpath('se.transmode.gradle:gradle-docker:1.2')
 	}
 }
 
@@ -21,7 +18,7 @@ apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
 apply plugin: 'application'
 apply plugin: 'docker'
-apply plugin: 'com.jfrog.artifactory'
+//apply plugin: 'com.jfrog.artifactory'
 apply plugin: 'maven-publish'
 apply plugin: 'jacoco'
 
@@ -70,7 +67,7 @@ task buildDocker(type: Docker, dependsOn: build) {
 mainClassName = 'com.vagas.desafiotecnico.DesafioTecnicoApplication'
 
 
-/* Publicação no jfrog */
+/* Publicação no jfrog 
 artifactoryPublish.skip = true // Alterar para 'false' somente quando for publicar o artefato.
 
 task sourcesJar(type: Jar) {
@@ -106,3 +103,4 @@ artifactory {
         }
     }
 }
+*/
