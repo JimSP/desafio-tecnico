@@ -52,6 +52,10 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
+jar {
+	baseName = 'desafio-tecnico'
+}
+
 task buildDocker(type: Docker, dependsOn: build) {
 	push = false
 	applicationName = jar.baseName

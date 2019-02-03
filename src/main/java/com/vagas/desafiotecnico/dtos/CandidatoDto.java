@@ -21,7 +21,7 @@ public class CandidatoDto implements ApiStatusDto{
 	private Integer codigo;
 	private String mensagem;
 	
-	@JsonProperty("id_candidatura")
+	@JsonProperty("id_pessoa")
 	private BigInteger id;
 	
 	@NotBlank(message="nome deve ser preenchido.")
@@ -37,13 +37,14 @@ public class CandidatoDto implements ApiStatusDto{
 	@NotNull(message="nivel invalido.")
 	private Integer nivel;
 	
+	@JsonProperty("score")
 	private Integer pontuacao;
 
 	@JsonCreator
 	public CandidatoDto(
 			@JsonProperty("codigo") final Integer codigo,
 			@JsonProperty("mensagem") final String mensagem,
-			@JsonProperty("id_candidatura") final BigInteger id,
+			@JsonProperty("id_pessoa") final BigInteger id,
 			@JsonProperty("nome") final String nome,
 			@JsonProperty("profissao") final String profissao,
 			@JsonProperty("localizacao") final String localizacao,
