@@ -1,45 +1,75 @@
-# Desafio para Engenheiro(a) de Software - VAGAS.com
+###Deploy
 
-Este documento descreve o exercício de programação para a vaga de Engenheiro(a) de Software da VAGAS.com.
+cd desafio-tecnico
+sudo ./runApp.sh
 
-## Considerações sobre o desafio
+###Lógica
+O modelo pensando efetua o calculo de distancias na Regiao (Grafo) à partir de uma Localidade (Nó), calculando assim todas as distancias para essa Localidade.
 
-* O prazo para entrega da solução é de 7 dias corridos, contados a partir da data de recebimento do desafio. Caso você precise de mais tempo, entre em contato conosco e fechamos uma nova data para a entrega. Não se preocupe, somos super flexíveis ;)
-* Utilize uma das seguintes linguagens: Ruby, Python, Java ou C#. Caso queira desenvolver em uma linguagem diferente das listadas aqui, fique à vontade. Podemos demorar um pouco mais em dar um retorno nesses casos.
-* A utilização de frameworks/bibliotecas é livre para a construção da solução, exceto quando o enunciado indicar o contrário.
-* Em relação aos dados, estes poderão ser armazenados em memória durante a execução da API ou em banco de dados (relacional, não-relacional, chave-valor etc.). Escolha o que achar que faz mais sentido para o problema.
-* O código produzido deve estar versionado em algum repositório público (Github, Bitbucket etc.)
-* Quando estiver tudo pronto, você deve mandar um e-mail para codesubmissions@vagas.com.br com o assunto `Engenheiro(a) de Software VAGAS.com - <%SEU_NOME%>` e o link para o seu repositório.
+Na inicialização são carregadas as Regioes para cada Localidade, e por demanda essa região vai sendo calculada e armazenada no cache do cluster.c
 
+Melhorias possiveis:
 
-## Desafio
+	Caso o tamanho da Regiao fique absurdamente grande (ordem de dezena de milhões) talvez deva ser considerado dois pontos:
+		1. efetuar o calculo da Regiao durante a inicialização.
+		2. alterar a lógica para efetuar busca por Caminhos (arestas), para isso seria preciso criar um novo método na classe FuncaoMenorCaminho. O novo método:
+			public Optional<Localidade> buscarLocalidade(Regiao regiao, Ponto pontoOrigem, Ponto pontoDestino);
+			
+		Com essa abordagem não seria mais preciso ter uma carga de Regiões na inicialização, porém o tempo médio de uma busca seria significamente mais alto, porém ainda dentro do aceitavel (muito menor que 1s).
 
-O desafio pode ser acessado pelo [link](desafio-tecnico.md).
+###Arquitetura
 
-## Documentação e Deploy
+O primeiro ponto levado em consideração foi manter o código simples, limpo e
+legivel.
 
-Crie uma documentação breve sobre a sua solução, com explicação sobre a arquitetura/design e hipóteses assumidas.
+Foi escolhido o spring-boot como "microcontainer" para a execução da mesma pela simplicidade de pouca configuração que o mesmo oferece, ter diversas features já bem resolvidas e maduras, tal como actuator, spring-data, spring-mvc. (Esses foram utilizados).
 
-Esperamos também um passo a passo de como executar a sua solução. Quanto mais simples, melhor. Vale ressaltar que a execução **não poderá depender do uso de alguma IDE específica**.
+Foi escolhido o gradle para fazer o build do projeto pela clareza e facilidade de efetuar alterações no mesmo, a manutenção do build.gradle é mais simples do que um pom.xml.
 
-A utilização de Docker é um plus ;)
+A construção foi iniciada pelas funções para efetuar busca de menor distancia e calculo da pontuação..
+Essa decisão foi tomada levando em cosideração::
 
-## Avaliação
+	que esse é o objetivo final, o que realmente possui valor..
+	todos os demais requisitos dependem dessas funções estarem funcionando corretamente, qualquer alteração nessas funções poderiam ter um custo alto de rafatoração mais na frente..
+	os demais requisitos são na maioria utilização de frameworks, framework tem que ser fácil tirar e por. Regra é dificil corrigir depois que tudo funciona ao seu redor menos ela..
 
-A sua solução será avaliada por um time de engenheiros(as) de software aqui da VAGAS.com, com base nos seguintes critérios:
+Para facilitar o entendimento do problema o termo grafo, nó e aresta foram abstraidos, Região, Localização e Caminho são nomes que permitem explicar o problema de maneira mais simples (primeiro ponto a ser levado em consideração)..
+Por cossequencia parte da modelagem do problema foi resolvida..
 
-### Execução
+Logo após foi construida a parte de persistencia..
+Foi escolhido o Hazelcast por ser um memory data grid facil de escalar, com mecanismos de auto-discovery, clusterização e provider de cache do spring boot já muito bem resolvidos, além disso ele oferece uma performance bastante significativa..
 
-* **Build:** A solução contém instruções claras para configurarmos o ambiente e fazer o build?
-* **Execução:** A documentação enviada contém todas as instruções necessárias para executarmos sua solução? Todos os requisitos foram implementados na solução entregue?
-* **Performance:** A solução possui uma performance adequada?
+O Fato dele ter opção de funcionamento embarcado com Spring Boot e possuir biblioteca que implementa as interfaces de repositories do spring-data foi levado em consideração.
+Dessa forma foi simples e pouco custoso para resolver a persistencia..
 
-### Código
+Foi construida então a camada de API com base na documentação fornecida nos enunciados desse desafio.
+Foram criados Dtos para fazer o transporte de dados na camada afim de preservar o contrato de dados de alterações do Core e de preservar alterações no Core devido a alterações de contrato de dados.
 
-* **Manutenibilidade e extensibilidade:** O código escrito é de fácil leitura? O quão fácil é criar novas funcionalidades na solução existente?
-* **Arquitetura e Design:** Como está desenhada a arquitetura da solução? As responsabilidades estão bem definidas? Foi utilizada alguma técnica para guiar o desenvolvimento?
-* **Qualidade de Código e Testes:** Foi utilizada alguma ferramenta de estilo de código para a linguagem? A solução possui testes unitários? É fácil alterar os testes caso haja modificação na solução?
+Foi utilizado o ModelMapper para tratar as conversões de dados entre a camada de API e o core, foi escolhido esse framework pela sofisticação e flexibilidade que o mesmo oferece para fazer as projecoes e as planificaçoes de dados.
 
-Esperamos que você se divirta codificando essa solução. Estamos aqui (codesubmissions@vagas.com.br) caso surjam dúvidas durante o desenvolvimento.
+Foi utilizado java-validations para validar os payloads de requisição e o Jackson para Serializações e Deserializações de Json trafegados na API.
 
-Bom código! ;)
+Foi utilizado o swagger para auto-documentar a API, o que saiu de graça..
+
+Então foi montada a camada se serviços, e os componentes de Funções, Persistencia e API foram naturalmente se ligado.
+
+O Cache foi utilizado para armazenar as rotas calculadas, afim de evitar custo para calcular a mesma rota N vezes, o mesmo foi feito para o calculo de score..
+Os testes únitarios foram sendo escritos conforme a necessidade de verificação do funcionamento de partes especificas do código.
+Alguns perderam o sentido e foram retirados do código.
+Foram levados dois pontos em consideração:
+
+	1.	testar funcionalidades. 
+	2.	os testes foram escritos para terem sentido e serem integrados.
+	3.	ter uma corbertura realmente significativa, ou seja, cobrir trechos de código que precisam ser cobertos.
+
+O Tratamento de erros foi feito com o intuito de ser o mais auto-explicativo e fornecer uma boa rastreabilidade para analises..
+O Log segue esse mesmo raciocinio, foi utilizado um padrão bastante rigoroso na escrita de logs afim de facilitar a O Log segue esse mesmo raciocinio, foi utilizado um padrão bastante rigoroso na escrita de logs afim de facilitar consultas e consultas por um Splunk Graylog ou ELK por exemplo..
+
+Colocando um API-Gateway com balanceamento e auto-discovery "na frente" da API, é possivel ter quantas instancias se quiser dessa aplicação, não apenas a carga será distribuida, os dados tambem, isso ficou de graça com o Hazelcast.
+
+Para facilitar a execução e o deploy da aplicação, foi utilizado o docker através do gradle, assim com 1 único comando, tudo acontece, bem mais simples (o que sempre deve ser levado em consideração).
+
+Foi add plugin para integração com SonarQube para analise de código e do JFrog para publicação e versionamento do Jar, como o mesmo é pago, está comentado, foi mantido para demonstração.
+
+Não foi implementado um Jenkinsfile pois uma pipeline tem muitas dependencias operacionais e de infraestrutura.
+.
