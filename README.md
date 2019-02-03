@@ -1,7 +1,40 @@
 ###Deploy
 
-cd desafio-tecnico
-sudo ./runApp.sh
+Para baixar os fontes
+
+	git clone https://github.com/JimSP/desafio-tecnico.git
+
+Acessando o diretório dos fontes
+
+	cd desafio-tecnico
+
+Para fazer um clean
+
+	./gradlew clean
+
+Para fazer um build
+
+	./gradlew build
+
+Para executar a app
+	
+	./gradlew bootRun
+
+Para gerar uma imagem Docker
+
+	sudo ./gradlew buildDocker
+	
+Para executar a imagem docker
+
+	docker run -p 9000:9000 com.vagas/desafio-tecnico:0.0.1
+
+Para fazer um clean, gerar um build, criar uma imagem com Docker e executar a app (tudo o que você precisa)
+
+	sudo ./runApp.sh
+
+###Documentação API
+
+http://localhost:9000/swagger-ui.html
 
 ###Lógica
 O modelo pensando efetua o calculo de distancias na Regiao (Grafo) à partir de uma Localidade (Nó), calculando assim todas as distancias para essa Localidade.
