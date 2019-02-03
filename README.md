@@ -27,7 +27,7 @@ Foi escolhido o spring-boot como "microcontainer" para a execução da mesma pel
 Foi escolhido o gradle para fazer o build do projeto pela clareza e facilidade de efetuar alterações no mesmo, a manutenção do build.gradle é mais simples do que um pom.xml.
 
 A construção foi iniciada pelas funções para efetuar busca de menor distancia e calculo da pontuação..
-Essa decisão foi tomada levando em cosideração::
+Essa decisão foi tomada levando em cosideração:
 
 	que esse é o objetivo final, o que realmente possui valor..
 	todos os demais requisitos dependem dessas funções estarem funcionando corretamente, qualquer alteração nessas funções poderiam ter um custo alto de rafatoração mais na frente..
@@ -72,4 +72,100 @@ Para facilitar a execução e o deploy da aplicação, foi utilizado o docker at
 Foi add plugin para integração com SonarQube para analise de código e do JFrog para publicação e versionamento do Jar, como o mesmo é pago, está comentado, foi mantido para demonstração.
 
 Não foi implementado um Jenkinsfile pois uma pipeline tem muitas dependencias operacionais e de infraestrutura.
-.
+
+###Testes Manuais
+
+Url:http://localhost:9000/v1/vagas
+
+Method:POST
+
+Content-Type:application/json
+
+Payload:
+{
+    "empresa": "Teste",
+    "titulo": "Vaga teste",
+    "descricao": "Criar os mais diferentes tipos de teste",
+    "localizacao": "A",
+    "nivel": 3
+}
+
+Response:
+{
+  "codigo": 0,
+  "mensagem": "OK",
+  "empresa": "Teste",
+  "titulo": "Vaga teste",
+  "descricao": "Criar os mais diferentes tipos de teste",
+  "localizacao": "A",
+  "nivel": 3,
+  "id": 144493360189538305
+}
+
+-----------------------------------------------------------------
+
+Url:http://localhost:9000/v1/pessoas
+
+Method:POST
+
+Content-Type:application/json
+
+Payload:
+{
+    "nome": "John Doe",
+    "profissao": "Engenheiro de Software",
+    "localizacao": "C",
+    "nivel": 2
+}
+
+Response:
+{
+  "codigo": 0,
+  "mensagem": "OK",
+  "id_pessoa": 144493360189603841,
+  "nome": "John Doe",
+  "profissao": "Engenheiro de Software",
+  "localizacao": "C",
+  "nivel": 2,
+  "score": null
+}
+
+-----------------------------------------------------------------
+
+Url:http://localhost:9000/v1/candidaturas
+
+Method:POST
+
+Content-Type:application/json
+
+Payload:
+{
+    "id_vaga": 144493360189538305,
+    "id_pessoa": 144493360189603841
+}
+
+Response:
+{
+  "codigo": 0,
+  "mensagem": "OK",
+  "idCandidato": 144482807190716417,
+  "idVaga": 144482807190650881
+}
+
+-----------------------------------------------------------------
+
+Url:http://localhost:9000/v1/vagas/144493360189538305/candidaturas/ranking
+
+Method:GET
+
+Response:
+{
+  "codigo": null,
+  "mensagem": null,
+  "id_pessoa": 144493360189603841,
+  "nome": "John Doe",
+  "profissao": "Engenheiro de Software",
+  "localizacao": "C",
+  "nivel": 2,
+  "score": 62
+}
