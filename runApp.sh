@@ -6,4 +6,4 @@ fi
 
 git pull
 ./gradlew clean build buildDocker --refresh-dependencies
-docker run desafio-tecnico:0.0.1
+docker run -p 9000:9000 com.vagas/desafio-tecnico:0.0.1
