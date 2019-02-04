@@ -3,12 +3,14 @@ package com.vagas.desafiotecnico.services.impl;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import com.vagas.desafiotecnico.dtos.StatusCodeDto;
 import com.vagas.desafiotecnico.exceptions.SistemaIndisponivelException;
 import com.vagas.desafiotecnico.functions.FuncaoMenorCaminho;
 import com.vagas.desafiotecnico.functions.FuncaoPontuacao;
+import com.vagas.desafiotecnico.models.Caminho;
 import com.vagas.desafiotecnico.models.Candidato;
 import com.vagas.desafiotecnico.models.Candidatura;
 import com.vagas.desafiotecnico.models.D;
@@ -19,6 +21,8 @@ import com.vagas.desafiotecnico.models.Regiao;
 import com.vagas.desafiotecnico.models.Vaga;
 import com.vagas.desafiotecnico.services.CalcularPontuacaoCandidatoInterface;
 import com.vagas.desafiotecnico.services.RegioesInterface;
+import com.vagas.desafiotecnico.system.FeatureToggleCommand;
+import com.vagas.desafiotecnico.system.FeatureToggleMenorCaminho;
 
 @Service
 public final class CalcularPontuacaoCandidatoService implements CalcularPontuacaoCandidatoInterface {
@@ -27,8 +31,10 @@ public final class CalcularPontuacaoCandidatoService implements CalcularPontuaca
 	private FuncaoPontuacao funcaoPontuacao;
 
 	@Autowired
-	private FuncaoMenorCaminho funcaoMenorCaminho;
-
+	@Qualifier("featureToggleMenorCaminho")
+	private FeatureToggleCommand<FuncaoMenorCaminho> featureToggleCommand;
+	
+	
 	@Autowired
 	private RegioesInterface regioesService;
 
@@ -49,24 +55,39 @@ public final class CalcularPontuacaoCandidatoService implements CalcularPontuaca
 
 	protected Integer buscarMenorDistancia(final Candidatura candidatura, final Regiao regiao) {
 
-		final Candidato candidato = candidatura.getCandidato();
-		final Vaga vaga = candidatura.getVaga();
+		final FeatureToggleMenorCaminho featureToggleMenorCaminho = (FeatureToggleMenorCaminho) featureToggleCommand;
+		
+		if(featureToggleCommand.getFeatureToggleStatus().habilitado()) {
+			final FuncaoMenorCaminho funcaoMenorCaminho = featureToggleMenorCaminho.getFunctionFeatureToggle();
+			final Candidato candidato = candidatura.getCandidato();
+			final Vaga vaga = candidatura.getVaga();
+			
+			final Optional<Localidade> localidadeCandidato = funcaoMenorCaminho.buscarLocalidade(regiao,
+					candidato.getLocalizacao());
+			
+			final Optional<Localidade> localidadeVaga = funcaoMenorCaminho.buscarLocalidade(regiao, vaga.getLocalizacao());
+			if(featureToggleMenorCaminho.getFeatureToggleFuncaoMenorCaminhoProperties().getUtilizarMetodoPorRegiao()) {
+				if (localidadeCandidato.isPresent() && localidadeVaga.isPresent()) {
+					final Optional<Localidade> localidades = funcaoMenorCaminho
+							.buscarMenorCaminhoDaRegiao(regiao, localidadeCandidato.get())
+							.getLocalidades()
+							.stream()
+							.filter(localidade -> localidade.equals(localidadeVaga.get()))
+							.findFirst();
 
-		final Optional<Localidade> localidadeCandidato = funcaoMenorCaminho.buscarLocalidade(regiao,
-				candidato.getLocalizacao());
-		final Optional<Localidade> localidadeVaga = funcaoMenorCaminho.buscarLocalidade(regiao, vaga.getLocalizacao());
-
-		if (localidadeCandidato.isPresent() && localidadeVaga.isPresent()) {
-			final Optional<Localidade> localidades = funcaoMenorCaminho
-					.buscarMenorCaminhoDaRegiao(regiao, localidadeCandidato.get())
-					.getLocalidades()
-					.stream()
-					.filter(localidade -> localidade.equals(localidadeVaga.get()))
-					.findFirst();
-
-			return localidades.orElseThrow(
-					() -> new SistemaIndisponivelException(StatusCodeDto.CODIGO_ERRO_SISTEMA_INDIPONIVEL.getMensagem()))
-					.getDistancia();
+					return localidades.orElseThrow(
+							() -> new SistemaIndisponivelException(StatusCodeDto.CODIGO_ERRO_SISTEMA_INDIPONIVEL.getMensagem()))
+							.getDistancia();
+				}
+			}else {
+				final Optional<Localidade> localidadeOrigem = funcaoMenorCaminho.buscarLocalidade(regiao, candidato.getLocalizacao());
+				final Optional<Localidade> localidadeDestino = funcaoMenorCaminho.buscarLocalidade(regiao, vaga.getLocalizacao());
+				
+				if(localidadeOrigem.isPresent() && localidadeDestino.isPresent()) {
+					final Caminho caminho = funcaoMenorCaminho.buscarMenorCaminhoDaRegiao(regiao, localidadeOrigem.get(), localidadeDestino.get());
+					return caminho.getDistancia();
+				}
+			}	
 		}
 
 		throw new SistemaIndisponivelException(StatusCodeDto.CODIGO_ERRO_SISTEMA_INDIPONIVEL.getMensagem());

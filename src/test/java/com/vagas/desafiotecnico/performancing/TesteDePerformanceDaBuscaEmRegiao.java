@@ -8,6 +8,7 @@ import org.junit.Test;
 
 import com.vagas.desafiotecnico.creators.CriadorLocalidade;
 import com.vagas.desafiotecnico.functions.FuncaoMenorCaminho;
+import com.vagas.desafiotecnico.functions.impl.FuncaoMenorCaminhoImpl;
 import com.vagas.desafiotecnico.models.Localidade;
 import com.vagas.desafiotecnico.models.Regiao;
 
@@ -16,7 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class TesteDePerformanceDaBuscaEmRegiao {
 
-	private FuncaoMenorCaminho funcaoMenorCaminho = new FuncaoMenorCaminho();
+	private FuncaoMenorCaminho funcaoMenorCaminhoAteDestino = new FuncaoMenorCaminhoImpl();
 
 	private Regiao regiao;
 	private String primeiraLocalidade = UUID.randomUUID().toString();
@@ -47,7 +48,7 @@ public class TesteDePerformanceDaBuscaEmRegiao {
 		final Long begin = System.nanoTime();
 		final Long beginMilis = System.currentTimeMillis();
 		
-		funcaoMenorCaminho.buscarMenorCaminhoDaRegiao(regiao,
+		funcaoMenorCaminhoAteDestino.buscarMenorCaminhoDaRegiao(regiao,
 				Localidade.builder().ponto(ultimaLocalidade).build());
 		
 		final Long end = System.nanoTime();
