@@ -2,7 +2,6 @@ package com.vagas.desafiotecnico.api.impl;
 
 import java.math.BigInteger;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 import javax.validation.Valid;
@@ -23,7 +22,6 @@ import com.vagas.desafiotecnico.api.CandidaturasRestInterface;
 import com.vagas.desafiotecnico.dtos.CandidatoDto;
 import com.vagas.desafiotecnico.dtos.CandidaturaDto;
 import com.vagas.desafiotecnico.dtos.StatusCodeDto;
-import com.vagas.desafiotecnico.exceptions.SistemaIndisponivelException;
 import com.vagas.desafiotecnico.models.Candidato;
 import com.vagas.desafiotecnico.models.Candidatura;
 import com.vagas.desafiotecnico.models.Vaga;
@@ -31,7 +29,6 @@ import com.vagas.desafiotecnico.services.CalcularPontuacaoCandidatoInterface;
 import com.vagas.desafiotecnico.services.CandidatosInterface;
 import com.vagas.desafiotecnico.services.CandidaturasInterface;
 import com.vagas.desafiotecnico.services.VagasInterface;
-import com.vagas.desafiotecnico.services.impl.ExecuteOverHazelcastService;
 
 @RestController
 public class CandidaturasRestController implements CandidaturasRestInterface {
@@ -49,9 +46,6 @@ public class CandidaturasRestController implements CandidaturasRestInterface {
 	private CalcularPontuacaoCandidatoInterface calcularPontuacaoCandidatoService;
 
 	@Autowired
-	private ExecuteOverHazelcastService executeOverHazelcastService;
-
-	@Autowired
 	private ModelMapper modelMapper;
 
 	/*
@@ -65,26 +59,18 @@ public class CandidaturasRestController implements CandidaturasRestInterface {
 	@PostMapping(path = "/v1/candidaturas", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	@ResponseStatus(code = HttpStatus.CREATED)
 	public @ResponseBody CandidaturaDto post(@Valid @RequestBody final CandidaturaDto candidaturaDto) {
-		try {
-			return executeOverHazelcastService.submit("CandidaturasRestController.post", () -> {
-				final Candidato candidato = candidatosService.buscarCandidato(candidaturaDto.getIdCandidato());
+		final Candidato candidato = candidatosService.buscarCandidato(candidaturaDto.getIdCandidato());
 
-				final Vaga vaga = vagasService.buscarVaga(candidaturaDto.getIdVaga());
+		final Vaga vaga = vagasService.buscarVaga(candidaturaDto.getIdVaga());
 
-				final Candidatura candidaturaResult = candidaturaService.candidatar(candidato, vaga);
+		final Candidatura candidaturaResult = candidaturaService.candidatar(candidato, vaga);
 
-				final CandidaturaDto candidaturaDtoResponse = modelMapper.map(candidaturaResult, CandidaturaDto.class);
+		final CandidaturaDto candidaturaDtoResponse = modelMapper.map(candidaturaResult, CandidaturaDto.class);
 
-				candidaturaDtoResponse.setCodigo(StatusCodeDto.CODIGO_SUCESSO.getCodigo());
-				candidaturaDtoResponse.setMensagem(StatusCodeDto.CODIGO_SUCESSO.getMensagem());
+		candidaturaDtoResponse.setCodigo(StatusCodeDto.CODIGO_SUCESSO.getCodigo());
+		candidaturaDtoResponse.setMensagem(StatusCodeDto.CODIGO_SUCESSO.getMensagem());
 
-				return candidaturaDtoResponse;
-			}).get();
-		} catch (InterruptedException | ExecutionException e) {
-			throw new SistemaIndisponivelException(e);
-		} finally {
-			Thread.currentThread().interrupt();
-		}
+		return candidaturaDtoResponse;
 	}
 
 	/*
@@ -97,21 +83,10 @@ public class CandidaturasRestController implements CandidaturasRestInterface {
 	@Override
 	@GetMapping(path = "/v1/vagas/{id_vaga}/candidaturas/ranking", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public @ResponseBody List<CandidatoDto> get(@PathVariable(name = "id_vaga", required = true) BigInteger idVaga) {
+		final List<Candidatura> candidaturas = candidaturaService.buscarCandidatura(idVaga);
 
-		try {
-			return executeOverHazelcastService.submit("CandidaturasRestController.get", () -> {
-				final List<Candidatura> candidaturas = candidaturaService.buscarCandidatura(idVaga);
-
-				return candidaturas.stream()
-						.map(candidatura -> calcularPontuacaoCandidatoService.calcular(candidatura).getCandidato())
-						.map(mapper -> modelMapper.map(mapper, CandidatoDto.class)).collect(Collectors.toList());
-			}).get();
-		} catch (InterruptedException |
-
-				ExecutionException e) {
-			throw new SistemaIndisponivelException(e);
-		} finally {
-			Thread.currentThread().interrupt();
-		}
+		return candidaturas.stream()
+				.map(candidatura -> calcularPontuacaoCandidatoService.calcular(candidatura).getCandidato())
+				.map(mapper -> modelMapper.map(mapper, CandidatoDto.class)).collect(Collectors.toList());
 	}
 }

@@ -1,7 +1,5 @@
 package com.vagas.desafiotecnico.api.impl;
 
-import java.util.concurrent.ExecutionException;
-
 import javax.validation.Valid;
 
 import org.modelmapper.ModelMapper;
@@ -17,10 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.vagas.desafiotecnico.api.VagasRestInterface;
 import com.vagas.desafiotecnico.dtos.StatusCodeDto;
 import com.vagas.desafiotecnico.dtos.VagaDto;
-import com.vagas.desafiotecnico.exceptions.SistemaIndisponivelException;
 import com.vagas.desafiotecnico.models.Vaga;
 import com.vagas.desafiotecnico.services.VagasInterface;
-import com.vagas.desafiotecnico.services.impl.ExecuteOverHazelcastService;
 
 @RestController
 public class VagasRestController implements VagasRestInterface {
@@ -30,9 +26,6 @@ public class VagasRestController implements VagasRestInterface {
 	
 	@Autowired
 	private ModelMapper modelMapper;
-	
-	@Autowired
-	private ExecuteOverHazelcastService executeOverHazelcastService;
 
 	/* (non-Javadoc)
 	 * @see com.vagas.desafiotecnico.api.impl.VagasRestInterface#post(com.vagas.desafiotecnico.models.Vaga)
@@ -41,24 +34,14 @@ public class VagasRestController implements VagasRestInterface {
 	@PostMapping(path = "/v1/vagas", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	@ResponseStatus(code = HttpStatus.CREATED)
 	public @ResponseBody VagaDto post(@Valid @RequestBody final VagaDto vagaDto) {
-		try {
-			return executeOverHazelcastService.submit("VagasRestController.post", () -> {
-				final Vaga vaga = modelMapper.map(vagaDto, Vaga.class);
-				final Vaga cagaCriada = vagasService.salvar(vaga);
-				
-				final VagaDto vagaResultDto = modelMapper.map(cagaCriada, VagaDto.class);
-				
-				vagaResultDto.setCodigo(StatusCodeDto.CODIGO_SUCESSO.getCodigo());
-				vagaResultDto.setMensagem(StatusCodeDto.CODIGO_SUCESSO.getMensagem());
-				
-				return vagaResultDto;
-			}).get();
-		} catch (InterruptedException |
-
-				ExecutionException e) {
-			throw new SistemaIndisponivelException(e);
-		} finally {
-			Thread.currentThread().interrupt();
-		}
+		final Vaga vaga = modelMapper.map(vagaDto, Vaga.class);
+		final Vaga cagaCriada = vagasService.salvar(vaga);
+		
+		final VagaDto vagaResultDto = modelMapper.map(cagaCriada, VagaDto.class);
+		
+		vagaResultDto.setCodigo(StatusCodeDto.CODIGO_SUCESSO.getCodigo());
+		vagaResultDto.setMensagem(StatusCodeDto.CODIGO_SUCESSO.getMensagem());
+		
+		return vagaResultDto;
 	}
 }
