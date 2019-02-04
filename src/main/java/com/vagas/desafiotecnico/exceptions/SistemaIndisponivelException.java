@@ -12,4 +12,8 @@ public class SistemaIndisponivelException extends RuntimeException{
 	public SistemaIndisponivelException(final String message) {
 		super(message);
 	}
+	
+	public SistemaIndisponivelException(final Exception e) {
+		super(e);
+	}
 }
